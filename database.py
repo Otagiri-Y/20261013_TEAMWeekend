@@ -114,6 +114,7 @@ def get_search_pages() -> list[dict]:
         pages.append(
             {
                 "id": row["chunk_id"],
+                "meeting_id": row["meeting_id"],
                 "title": row["title"],
                 "description": "",
                 "full_text": content,
@@ -135,3 +136,24 @@ def count_meetings() -> int:
         ).fetchone()
 
     return row["count"]
+
+def get_meeting(meeting_id: int):
+
+    with get_connection() as conn:
+        row = conn.execute(
+            """
+            SELECT
+                id,
+                title,
+                held_on,
+                raw_text
+            FROM meetings
+            WHERE id = ?
+            """,
+            (meeting_id,)
+        ).fetchone()
+
+    if row is None:
+        return None
+
+    return dict(row)
