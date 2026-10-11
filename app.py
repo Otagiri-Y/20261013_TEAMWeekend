@@ -22,7 +22,6 @@ st.title("議事録検索")
 with st.sidebar:
     st.header("登録状況")
     st.metric("会議数", count_meetings())
-    st.metric("段落数", len(pages))
 
 tab1, tab2 = st.tabs(["検索", "アップロード"])
 
