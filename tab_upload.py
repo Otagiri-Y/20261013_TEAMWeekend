@@ -28,19 +28,20 @@ def render():
             return
 
         result = ingest_meeting(
-            uploaded_file,
+            uploaded_file.name,        # ファイル名
+            uploaded_file.getvalue(),  # 中身（bytes）
             title.strip(),
-            held_on.isoformat()
+            held_on.isoformat(),
         )
 
-        if result.get("status") == "success":
+        if result.get("状態") == "success":
             st.success("会議録を登録しました！")
             st.cache_data.clear()
 
-        elif result.get("status") == "duplicate":
+        elif result.get("状態") == "duplicate":
             st.warning("この会議録はすでに登録されています。")
 
         else:
             st.error(
-                result.get("error", "会議録の登録に失敗しました。")
+                result.get("エラー内容", "会議録の登録に失敗しました。")
             )
