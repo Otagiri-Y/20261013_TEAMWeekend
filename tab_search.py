@@ -1,7 +1,7 @@
 import streamlit as st
 
 from search import highlight_match
-from search_fulltext import search_fulltext
+from ranking import rebuild_index, get_engine
 from tab_detail import render_detail
 
 def open_detail(meeting_id, keyword):  # ← 追加（この関数ごと）
@@ -30,7 +30,8 @@ def render(pages):
         st.info("キーワードを入力してください。")
         return
 
-    results = search_fulltext(keyword, pages)
+    rebuild_index(pages)
+    results = get_engine().search(keyword, top_n=20)
 
     if not results:
         st.warning("該当する会議録は見つかりませんでした。")
@@ -50,15 +51,18 @@ def render(pages):
         
         st.caption(f"開催日：{meeting_date}")
         
-        preview = result.get("preview", "")
+        preview = result.get("full_text", "")
         highlighted_preview = highlight_match(preview, keyword)
         
         st.markdown(highlighted_preview)
+
+
+        meeting_id = result.get("meeting_id") or result.get("url")
 
         st.button(
             "全体を見る",
             key=f"view_{result['id']}",
             on_click=open_detail,
-            args=(result["meeting_id"], keyword)
+            args=(int(meeting_id), keyword)
         )
         st.divider()
