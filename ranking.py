@@ -60,11 +60,20 @@ class SearchEngine:
         for index, base_score in enumerate(similarities):
             if base_score <= 0:
                 continue
+        for index, base_score in enumerate(similarities):
+
 
             result = self.pages[index].copy()
 
             result["base_score"] = float(base_score)
-            result["relevance_score"] = float(base_score)
+
+            relevance_score = float(base_score)
+
+            word_count = result.get("word_count")
+            if word_count is not None and word_count < 50:
+                relevance_score *= 0.7
+
+            result["relevance_score"] = relevance_score
 
             results.append(result)
 
@@ -74,7 +83,6 @@ class SearchEngine:
         )
 
         return results[:top_n]
-
 
 _engine = SearchEngine()
 
