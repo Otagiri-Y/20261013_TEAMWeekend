@@ -92,17 +92,15 @@ def get_search_pages() -> list[dict]:
         rows = conn.execute(
             """
             SELECT
-                chunks.id AS chunk_id,
                 meetings.id AS meeting_id,
                 meetings.title AS title,
                 meetings.held_on AS held_on,
-                chunks.content AS content
-            FROM chunks
-            JOIN meetings
-                ON chunks.meeting_id = meetings.id
+                meetings.raw_text AS content
+            FROM meetings
             ORDER BY
                 meetings.held_on DESC,
-                chunks.chunk_index ASC
+                meetings.id DESC
+
             """
         ).fetchall()
 
@@ -113,7 +111,7 @@ def get_search_pages() -> list[dict]:
 
         pages.append(
             {
-                "id": row["chunk_id"],
+                "id": row["meeting_id"],
                 "meeting_id": row["meeting_id"],
                 "title": row["title"],
                 "description": "",

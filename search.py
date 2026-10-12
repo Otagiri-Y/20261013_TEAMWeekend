@@ -37,19 +37,17 @@ def search_pages(query: str, pages: list) -> list:
     return results
 
 
+# 検索語の強調に使うスタイル（検索結果・全体表示で共通）
+HIGHLIGHT_STYLE = (
+    "background-color: #fff2a8; color: #333333; font-weight: bold; "
+    "padding: 1px 2px; border-radius: 3px;"
+)
+
+
 def highlight_match(text: str, query: str) -> str:
-    """説明文の中のキーワードを **太字** にする"""
+    """検索結果用。highlight_terms と同じ見た目で強調する。"""
+    return highlight_terms(text, query)
 
-    if not query:              
-        return text
-
-    pattern = re.compile(
-        re.escape(query),        
-        re.IGNORECASE                 
-    )
-
-   
-    return pattern.sub(f"**{query}**", text)
 
 def find_match_ranges(text: str, query: str) -> list[tuple[int, int]]:
     """文章の中で、検索語が出てくる場所を (開始位置, 終了位置) のリストで返す。
@@ -100,7 +98,7 @@ def find_match_ranges(text: str, query: str) -> list[tuple[int, int]]:
     return merged
 
 def highlight_terms(text: str, query: str) -> str:
-    """文章の中の検索語に <mark> を付けた、表示用のHTML文字列を返す。
+    """文章の中の検索語に黄色の強調を付けた、表示用のHTML文字列を返す。
     改行は <br> に変える。
     """
 
@@ -112,8 +110,8 @@ def highlight_terms(text: str, query: str) -> str:
     for start, end in ranges:
         # 検索語の手前までは、そのまま書く
         result += html.escape(text[last:start])
-        # 検索語の部分は、<mark> で囲んで書く
-        result += "<mark>" + html.escape(text[start:end]) + "</mark>"
+        # 検索語の部分は、強調のスタイルを付けた span で囲んで書く
+        result += f'<span style="{HIGHLIGHT_STYLE}">' + html.escape(text[start:end]) + "</span>"
         last = end
 
     # 最後の検索語より後ろを、そのまま書く
