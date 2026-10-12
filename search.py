@@ -1,4 +1,5 @@
 import re
+import unicodedata
 
 
 def search_pages(query: str, pages: list) -> list:
@@ -27,15 +28,27 @@ def search_pages(query: str, pages: list) -> list:
 
 
 def highlight_match(text: str, query: str) -> str:
-    """説明文の中のキーワードを **太字** にする"""
-
-    if not query:              
+    if not query:
         return text
 
     pattern = re.compile(
-        re.escape(query),        
-        re.IGNORECASE                 
+        re.escape(query),
+        re.IGNORECASE
     )
 
-   
-    return pattern.sub(f"**{query}**", text)
+    return pattern.sub(
+        lambda m: f'<span style="background-color: #fff2a8; color: #333333; font-weight: bold; padding: 1px 2px; border-radius: 3px;">{m.group(0)}</span>',
+        text
+    )
+
+def normalize_text(text: str) -> str:
+    if not text:
+        return ""
+    return unicodedata.normalize("NFKC", str(text)).strip()
+
+
+def expand_query(query: str) -> list:
+    normalized_query = normalize_text(query)
+    if not normalized_query:
+        return []
+    return [normalized_query]
