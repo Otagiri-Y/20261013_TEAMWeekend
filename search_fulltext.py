@@ -206,3 +206,19 @@ def search_fulltext(query: str, pages: list) -> list:
     )
 
     return results
+
+def add_sections(result: dict, query: str) -> dict:
+    """TF-IDFの検索結果1件に、概要・決定事項・宿題を付けて返す。"""
+ 
+    full_text = result.get("full_text", "") or ""
+    result = result.copy()
+    result["preview"] = _make_preview(full_text, query)
+    result["decision"] = _extract_section(
+        full_text,
+        ["決定事項", "決定内容", "決定結果", "協議結果", "合意事項"]
+    )
+    result["pending"] = _extract_section(
+        full_text,
+        ["継続検討事項・宿題", "継続検討事項", "未決事項", "今後の宿題", "宿題"]
+    )
+    return result
